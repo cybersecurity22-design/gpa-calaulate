@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة المعدل التراكمي - جامعة البلقاء</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .results-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-right: 5px solid #667eea;
+        }
+
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .result-box.highlight {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .result-value.green {
+            color: #4caf50;
+        }
+
+        .add-course-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f0f4ff;
+            border-radius: 10px;
+        }
+
+        .add-course-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1.2fr 1.2fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: flex-end;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .form-row.repeat-row {
+            border-right: 4px solid #ff9800;
+            background: #fff8e1;
+        }
+
+        @media (max-width: 992px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .results-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.85em;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95em;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            padding: 8px 12px;
+            font-size: 0.85em;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .calculate-btn {
+            background: #28a745;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            background: #218838;
+        }
+
+        .courses-list {
+            margin-top: 30px;
+        }
+
+        .courses-list h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .course-item {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) auto;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-right: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            align-items: center;
+        }
+
+        .course-item.repeat-item {
+            border-right-color: #ff9800;
+            background: #fff8e1;
+        }
+
+        .course-info {
+            font-size: 0.9em;
+        }
+
+        .course-info strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .course-info span {
+            color: #666;
+            display: block;
+        }
+
+        .course-points {
+            text-align: center;
+            padding: 10px;
+            background: #f0f4ff;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .course-points .points-value {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .course-points .points-old {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-right: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #856404;
+        }
+
+        .note strong {
+            color: #856404;
+        }
+
+        .repeat-badge {
+            display: inline-block;
+            background: #ff9800;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            margin-right: 5px;
+        }
+
+        .old-code-badge {
+            background: #6c757d;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+        }
+
+        .new-code-badge {
+            background: #28a745;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+        }
+
+        .old-grade-section {
+            border-right: 3px solid #6c757d;
+            padding-right: 10px;
+            margin-top: 5px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-group button {
+            flex: 1;
+        }
+
+        .info-text {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .repeat-info {
+            border-right: 3px solid #ff9800;
+            padding: 5px 10px;
+            background: #fff8e1;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 0.8em;
+        }
+
+        .hours-info {
+            font-size: 0.75em;
+            margin-top: 3px;
+        }
+
+        .hours-info.repeat {
+            color: #dc3545;
+        }
+
+        .hours-info.new {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 حاسبة المعدل التراكمي</h1>
+        <p class="subtitle">نظام جامعة البلقاء التطبيقية</p>
+
+        <div class="results-section">
+            <div class="result-box">
+                <div class="result-label">المعدل الفصلي</div>
+                <div class="result-value" id="semesterGPA">0.00</div>
+            </div>
+            <div class="result-box highlight">
+                <div class="result-label">المعدل التراكمي</div>
+                <div class="result-value green" id="cumulativeGPA">0.00</div>
+            </div>
+            <div class="result-box">
+                <div class="result-label">إجمالي الساعات المقطوعة</div>
+                <div class="result-value" id="totalHours">0</div>
+            </div>
+        </div>
+
+        <div class="add-course-section" style="background: #f5f0ff; border-right: 5px solid #764ba2;">
+            <h2 style="color: #764ba2;">📊 بيانات الفصول السابقة (اختياري)</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>المعدل التراكمي السابق</label>
+                    <input type="number" id="previousGPA" min="0" max="4" step="0.01" value="0" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>عدد الساعات المقطوعة سابقاً</label>
+                    <input type="number" id="previousHours" min="0" step="1" value="0" placeholder="0">
+                </div>
+            </div>
+            <div class="info-text" style="margin-top: 10px;">
+                ⚠️ أدخل المعدل التراكمي وعدد الساعات التي قطعتها قبل هذا الفصل الدراسي
+            </div>
+        </div>
+
+        <div class="add-course-section">
+            <h2>➕ إضافة مواد الفصل الحالي</h2>
+            <div id="coursesForm">
+                <!-- سيتم إضافة الصفوف هنا برمجياً -->
+            </div>
+            <div class="btn-group">
+                <button onclick="addCourseRow()">➕ إضافة مادة</button>
+                <button onclick="calculateGPA()" class="calculate-btn">📊 حساب المعدل</button>
+            </div>
+        </div>
+
+        <div class="courses-list">
+            <h2>📋 المواد المضافة</h2>
+            <div id="coursesList" class="empty-message">لم تضف أي مواد حتى الآن</div>
+        </div>
+
+        <div class="note">
+            <strong>📌 نظام احتساب المواد المعادة في جامعة البلقاء:</strong><br>
+            • <strong>الساعات:</strong> المواد المعادة <strong>لا تحسب</strong> في إجمالي الساعات المقطوعة (محسوبة سابقاً)<br>
+            • <strong>الدرجة:</strong> يتم استخدام الدرجة الجديدة فقط في حساب المعدل التراكمي<br>
+            • <strong>المعدل الفصلي:</strong> يحسب باستخدام جميع مواد الفصل (الجديدة والمعادة)<br>
+            • <strong>المعدل التراكمي:</strong> يحسب باستخدام الدرجات الجديدة فقط للمواد المعادة
+        </div>
+    </div>
+
+    <script>
+        // جميع الرموز للمواد الجديدة (A إلى F)
+        const allGrades = [
+            { label: 'A', value: 4.00 },
+            { label: 'A-', value: 3.75 },
+            { label: 'B+', value: 3.50 },
+            { label: 'B', value: 3.25 },
+            { label: 'B-', value: 3.00 },
+            { label: 'C+', value: 2.75 },
+            { label: 'C', value: 2.50 },
+            { label: 'C-', value: 2.00 },
+            { label: 'D+', value: 1.75 },
+            { label: 'D', value: 1.25 },
+            { label: 'D-', value: 1.00 },
+            { label: 'F', value: 0.50 }
+        ];
+
+        // الرموز القديمة - النظام القديم
+        const oldGradesOldSystem = [
+            { label: 'C-', value: 1.75 },
+            { label: 'D+', value: 1.50 },
+            { label: 'D', value: 1.00 },
+            { label: 'D-', value: 0.75 },
+            { label: 'F', value: 0.50 }
+        ];
+
+        // الرموز القديمة - النظام الجديد
+        const oldGradesNewSystem = [
+            { label: 'C-', value: 2.00 },
+            { label: 'D+', value: 1.75 },
+            { label: 'D', value: 1.25 },
+            { label: 'D-', value: 1.00 },
+            { label: 'F', value: 0.50 }
+        ];
+
+        function getOldGrades(system) {
+            return system === 'old' ? oldGradesOldSystem : oldGradesNewSystem;
+        }
+
+        function populateGradeSelect(selectElement, pendingValue) {
+            selectElement.innerHTML = '<option value="">-- اختر الرمز --</option>';
+            allGrades.forEach(grade => {
+                const option = document.createElement('option');
+                option.value = grade.value;
+                option.textContent = `${grade.label} (${grade.value.toFixed(2)})`;
+                if (pendingValue !== undefined && parseFloat(pendingValue) === grade.value) {
+                    option.selected = true;
+                }
+                selectElement.appendChild(option);
+            });
+        }
+
+        function populateOldGradeSelect(selectElement, system, pendingValue) {
+            const options = getOldGrades(system);
+            
+            selectElement.innerHTML = '<option value="">-- اختر الرمز القديم --</option>';
+            options.forEach(grade => {
+                const option = document.createElement('option');
+                option.value = grade.value;
+                option.textContent = `${grade.label} (${grade.value.toFixed(2)})`;
+                if (pendingValue !== undefined && parseFloat(pendingValue) === grade.value) {
+                    option.selected = true;
+                }
+                selectElement.appendChild(option);
+            });
+        }
+
+        function addCourseRow() {
+            const form = document.getElementById('coursesForm');
+            const newRow = document.createElement('div');
+            newRow.className = 'form-row';
+            newRow.innerHTML = `
+                <div class="form-group">
+                    <label>عدد الساعات</label>
+                    <input type="number" class="hours-input" min="0" value="3">
+                    <div class="hours-info new">✓ تضاف إلى إجمالي الساعات</div>
+                </div>
+                <div class="form-group">
+                    <label>النوع</label>
+                    <select class="type-input" onchange="handleTypeChange(this)">
+                        <option value="new">مادة جديدة</option>
+                        <option value="repeat">معادة</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column: span 1;">
+                    <label class="grade-label">الدرجة <span class="new-code-badge">جديد</span></label>
+                    <select class="grade-input" onchange="updateGradeDisplay(this)">
+                        <!-- سيتم تعبئتها -->
+                    </select>
+                    <div class="gradeValue"></div>
+                </div>
+                <div class="form-group old-grade-section" style="display:none; grid-column: span 2;">
+                    <div style="font-size:0.8em; color:#6c757d; margin-bottom:3px;">📌 الدرجة القديمة (للعلم فقط)</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div>
+                            <label class="old-system-label" style="font-size:0.75em;">نظام الدرجة القديمة</label>
+                            <select class="old-system-input" onchange="handleOldSystemChange(this)">
+                                <option value="old">النظام القديم</option>
+                                <option value="new">النظام الجديد</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="old-grade-label" style="font-size:0.75em;">الدرجة القديمة <span class="old-code-badge">قديم</span></label>
+                            <select class="old-grade-input" onchange="updateOldGradeDisplay(this)">
+                                <!-- سيتم تعبئتها -->
+                            </select>
+                            <div class="oldGradeValue" style="font-size:0.8em; color:#6c757d;"></div>
+                        </div>
+                    </div>
+                    <div class="repeat-info">
+                        ⚠️ الدرجة القديمة للعلم فقط - تم استبدالها بالجديدة في حساب المعدل التراكمي
+                    </div>
+                </div>
+                <button type="button" class="delete-btn" onclick="removeRow(this)" style="margin-top: 25px;">✕</button>
+            `;
+            form.appendChild(newRow);
+            
+            const typeSelect = newRow.querySelector('.type-input');
+            const gradeSelect = newRow.querySelector('.grade-input');
+            const oldSystemSelect = newRow.querySelector('.old-system-input');
+            const oldGradeSelect = newRow.querySelector('.old-grade-input');
+            
+            populateGradeSelect(gradeSelect);
+            populateOldGradeSelect(oldGradeSelect, oldSystemSelect.value);
+            
+            updateDeleteButtonsVisibility();
+            calculateGPA();
+        }
+
+        function removeRow(button) {
+            const row = button.closest('.form-row');
+            row.remove();
+            updateDeleteButtonsVisibility();
+            calculateGPA();
+        }
+
+        function updateDeleteButtonsVisibility() {
+            const rows = document.querySelectorAll('.form-row');
+            rows.forEach(row => {
+                const btn = row.querySelector('.delete-btn');
+                btn.style.visibility = rows.length > 1 ? 'visible' : 'hidden';
+            });
+        }
+
+        function handleTypeChange(select) {
+            const row = select.closest('.form-row');
+            const oldSection = row.querySelector('.old-grade-section');
+            const gradeSelect = row.querySelector('.grade-input');
+            const hoursInfo = row.querySelector('.hours-info');
+            
+            if (select.value === 'repeat') {
+                oldSection.style.display = 'block';
+                row.classList.add('repeat-row');
+                row.querySelector('.grade-label').innerHTML = 'الدرجة الجديدة <span class="new-code-badge">جديد</span>';
+                const oldSystemSelect = row.querySelector('.old-system-input');
+                const oldGradeSelect = row.querySelector('.old-grade-input');
+                populateOldGradeSelect(oldGradeSelect, oldSystemSelect.value);
+                
+                if (hoursInfo) {
+                    hoursInfo.textContent = '✗ لا تضاف إلى إجمالي الساعات (محسوبة سابقاً)';
+                    hoursInfo.className = 'hours-info repeat';
+                }
+            } else {
+                oldSection.style.display = 'none';
+                row.classList.remove('repeat-row');
+                row.querySelector('.grade-label').innerHTML = 'الدرجة';
+                
+                if (hoursInfo) {
+                    hoursInfo.textContent = '✓ تضاف إلى إجمالي الساعات';
+                    hoursInfo.className = 'hours-info new';
+                }
+            }
+            
+            populateGradeSelect(gradeSelect);
+            updateGradeDisplay(gradeSelect);
+            calculateGPA();
+        }
+
+        function handleOldSystemChange(select) {
+            const row = select.closest('.form-row');
+            const oldGradeSelect = row.querySelector('.old-grade-input');
+            populateOldGradeSelect(oldGradeSelect, select.value);
+            updateOldGradeDisplay(oldGradeSelect);
+            calculateGPA();
+        }
+
+        function updateGradeDisplay(select) {
+            const display = select.parentElement.querySelector('.gradeValue');
+            display.textContent = select.selectedIndex > 0 ? select.options[select.selectedIndex].text : '';
+            calculateGPA();
+        }
+
+        function updateOldGradeDisplay(select) {
+            const display = select.parentElement.querySelector('.oldGradeValue');
+            display.textContent = select.selectedIndex > 0 ? select.options[select.selectedIndex].text : '';
+            calculateGPA();
+        }
+
+        function getCoursesFromForm() {
+            const courses = [];
+            const rows = document.querySelectorAll('.form-row');
+            
+            rows.forEach((row) => {
+                const hours = parseFloat(row.querySelector('.hours-input').value);
+                const type = row.querySelector('.type-input').value;
+                const grade = parseFloat(row.querySelector('.grade-input').value);
+                
+                let oldGrade = null;
+                let oldSystem = null;
+                
+                if (type === 'repeat') {
+                    const oldSystemSelect = row.querySelector('.old-system-input');
+                    const oldGradeSelect = row.querySelector('.old-grade-input');
+                    oldSystem = oldSystemSelect.value;
+                    oldGrade = parseFloat(oldGradeSelect.value);
+                }
+                
+                if (!isNaN(hours) && hours > 0 && !isNaN(grade)) {
+                    courses.push({
+                        hours,
+                        type,
+                        grade,
+                        oldGrade,
+                        oldSystem
+                    });
+                }
+            });
+            
+            return courses;
+        }
+
+        function calculateGPA() {
+            const courses = getCoursesFromForm();
+            const prevGPA = parseFloat(document.getElementById('previousGPA').value) || 0;
+            const prevHours = parseFloat(document.getElementById('previousHours').value) || 0;
+
+            // حساب المعدل الفصلي (جميع مواد الفصل)
+            let semesterPoints = 0;
+            let semesterHours = 0;
+            
+            courses.forEach(c => {
+                semesterPoints += c.grade * c.hours;
+                semesterHours += c.hours;
+            });
+            
+            const semesterGPA = semesterHours > 0 ? semesterPoints / semesterHours : 0;
+
+            // حساب المعدل التراكمي حسب نظام جامعة البلقاء
+            // المواد المعادة: لا تضاف ساعاتها إلى إجمالي الساعات (محسوبة سابقاً)
+            // ولكن تضاف نقاطها (باستخدام الدرجة الجديدة) إلى إجمالي النقاط
+            let totalPoints = 0;
+            let totalHours = 0;
+            
+            courses.forEach(c => {
+                // للمعاد: نستخدم الدرجة الجديدة فقط (يتم استبدال القديمة بالجديدة)
+                // للساعات: لا تضاف (لأنها محسوبة سابقاً)
+                if (c.type === 'new') {
+                    // المواد الجديدة: تضاف ساعاتها ونقاطها
+                    totalPoints += c.grade * c.hours;
+                    totalHours += c.hours;
+                } else {
+                    // المواد المعادة: تضاف نقاطها فقط (باستخدام الدرجة الجديدة)
+                    // ولا تضاف ساعاتها
+                    totalPoints += c.grade * c.hours;
+                    // totalHours لا تتغير - الساعات محسوبة سابقاً
+                }
+            });
+
+            // إضافة الفصول السابقة
+            const grandPoints = (prevGPA * prevHours) + totalPoints;
+            const grandHours = prevHours + totalHours;
+            const cumulativeGPA = grandHours > 0 ? grandPoints / grandHours : 0;
+
+            // عرض النتائج
+            document.getElementById('semesterGPA').textContent = semesterGPA.toFixed(2);
+            document.getElementById('cumulativeGPA').textContent = cumulativeGPA.toFixed(2);
+            document.getElementById('totalHours').textContent = grandHours;
+
+            // تحديث قائمة المواد
+            updateCoursesList(courses);
+        }
+
+        function updateCoursesList(courses) {
+            const list = document.getElementById('coursesList');
+            if (courses.length === 0) {
+                list.innerHTML = '<div class="empty-message">لم تضف أي مواد حتى الآن</div>';
+                return;
+            }
+
+            list.innerHTML = courses.map((c, index) => {
+                const pointsNew = c.grade * c.hours;
+                const pointsOld = c.oldGrade !== null ? c.oldGrade * c.hours : null;
+                const typeText = c.type === 'repeat' ? 
+                    `معادة <span class="repeat-badge">معادة</span>` : 
+                    `جديدة`;
+                
+                const itemClass = c.type === 'repeat' ? 'course-item repeat-item' : 'course-item';
+                
+                let gradeDisplay = `<strong>الدرجة: ${c.grade.toFixed(2)}</strong>`;
+                let pointsDisplay = `
+                    <div class="course-points">
+                        <span class="points-value">${pointsNew.toFixed(2)}</span>
+                        <div style="font-size: 0.8em; color: #999;">النقاط</div>
+                    </div>
+                `;
+                
+                let hoursDisplay = `${c.hours} ساعة`;
+                if (c.type === 'repeat') {
+                    hoursDisplay += ` <span style="font-size:0.7em; color:#dc3545;">(لا تحسب في الساعات)</span>`;
+                    gradeDisplay += `
+                        <br><span style="font-size:0.8em; color:#999;">
+                            الدرجة القديمة (${c.oldSystem === 'old' ? 'نظام قديم' : 'نظام جديد'}): ${c.oldGrade.toFixed(2)} 
+                            <span style="color:#ff9800;">(مستبدلة)</span>
+                        </span>
+                    `;
+                    pointsDisplay = `
+                        <div class="course-points">
+                            <span class="points-value">${pointsNew.toFixed(2)}</span>
+                            <div style="font-size: 0.8em; color: #999;">النقاط (الجديدة)</div>
+                            <div class="points-old">قديم: ${pointsOld.toFixed(2)}</div>
+                        </div>
+                    `;
+                } else {
+                    hoursDisplay += ` <span style="font-size:0.7em; color:#28a745;">(تضاف للساعات)</span>`;
+                }
+
+                return `
+                    <div class="${itemClass}">
+                        <div class="course-info">
+                            <strong>المادة ${index + 1}</strong>
+                            <span>${typeText}</span>
+                            <span>${hoursDisplay}</span>
+                        </div>
+                        <div class="course-info">
+                            ${gradeDisplay}
+                        </div>
+                        ${pointsDisplay}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // تحديث النتائج عند تغيير البيانات السابقة
+        document.getElementById('previousGPA').addEventListener('input', calculateGPA);
+        document.getElementById('previousHours').addEventListener('input', calculateGPA);
+
+        // تهيئة الصفحة
+        addCourseRow();
+    </script>
+</body>
+</html>
